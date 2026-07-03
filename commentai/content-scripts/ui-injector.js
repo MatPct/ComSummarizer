@@ -99,6 +99,113 @@ window.CommentAI.injectSummary = function injectSummary(summaryMarkdown, anchorE
   anchorEl.prepend(host);
 };
 
+/**
+ * Injecte, juste après le texte d'un commentaire, un bouton "Traduire".
+ * Au clic : appelle la Translator API et affiche la traduction sous le
+ * commentaire d'origine (le texte original reste visible).
+ *
+ * @param {Object} comment - { text, textElement, detectedLang }
+ * @param {string} targetLanguage - langue cible (langue de l'utilisateur)
+ */
+window.CommentAI.injectTranslateButton = function injectTranslateButton(
+  comment,
+  targetLanguage
+) {
+  const { textElement, text, detectedLang } = comment;
+  if (!textElement || !detectedLang) return;
+
+  // Évite les doublons si le script se relance sur le même commentaire.
+  if (textElement.dataset.commentaiButtonAdded) return;
+  textElement.dataset.commentaiButtonAdded = 'true';
+
+  const host = document.createElement('span');
+  const shadow = host.attachShadow({ mode: 'open' });
+
+  const style = document.createElement('style');
+  style.textContent = `
+    .translate-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: 8px;
+      padding: 2px 10px;
+      font-family: Roboto, Arial, sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: #6c5ce7;
+      background: #f0edff;
+      border: 1px solid #d9d0ff;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .translate-btn:hover { background: #e3ddff; }
+    .translate-btn:disabled { opacity: 0.6; cursor: default; }
+    .translation {
+      display: block;
+      margin-top: 6px;
+      padding: 8px 10px;
+      background: #f4f4f8;
+      border-left: 3px solid #6c5ce7;
+      border-radius: 4px;
+      font-family: Roboto, Arial, sans-serif;
+      font-size: 13px;
+      color: #333;
+    }
+    .translation-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #6c5ce7;
+      display: block;
+      margin-bottom: 2px;
+    }
+  `;
+
+  const button = document.createElement('button');
+  button.className = 'translate-btn';
+  button.type = 'button';
+  button.textContent = 'Traduire';
+
+  const translationBox = document.createElement('div');
+  translationBox.className = 'translation';
+  translationBox.style.display = 'none';
+  translationBox.innerHTML = '<span class="translation-label">Traduction (CommentAI)</span>';
+
+  button.addEventListener('click', async () => {
+    if (translationBox.style.display === 'block') {
+      // Toggle : masquer si déjà affichée.
+      translationBox.style.display = 'none';
+      button.textContent = 'Traduire';
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = 'Traduction...';
+
+    const translated = await window.CommentAI.translateText(
+      text,
+      detectedLang,
+      targetLanguage
+    );
+
+    button.disabled = false;
+
+    if (!translated) {
+      button.textContent = 'Traduction indisponible';
+      return;
+    }
+
+    translationBox.innerHTML = `<span class="translation-label">Traduction (CommentAI)</span>${translated}`;
+    translationBox.style.display = 'block';
+    button.textContent = 'Masquer la traduction';
+  });
+
+  shadow.appendChild(style);
+  shadow.appendChild(button);
+  shadow.appendChild(translationBox);
+
+  textElement.insertAdjacentElement('afterend', host);
+};
+
 window.CommentAI.injectUnavailableNotice = function injectUnavailableNotice(anchorEl) {
   if (!anchorEl) return;
   const existing = document.getElementById(CONTAINER_ID);

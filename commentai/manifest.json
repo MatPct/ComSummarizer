@@ -19,6 +19,8 @@
         "content-scripts/utils/dom-observer.js",
         "content-scripts/scrapers/youtube-scraper.js",
         "content-scripts/summarizer.js",
+        "content-scripts/language-detector.js",
+        "content-scripts/translator.js",
         "content-scripts/ui-injector.js",
         "content-scripts/main.js"
       ],
@@ -33,6 +35,8 @@
         "content-scripts/utils/dom-observer.js",
         "content-scripts/scrapers/reddit-scraper.js",
         "content-scripts/summarizer.js",
+        "content-scripts/language-detector.js",
+        "content-scripts/translator.js",
         "content-scripts/ui-injector.js",
         "content-scripts/main.js"
       ],

@@ -22,7 +22,11 @@ window.CommentAI.config = {
 
 /**
  * Extrait les commentaires actuellement chargés dans le DOM.
- * Retourne un tableau de { author, text, likes }.
+ * Retourne un tableau de { author, text, likes, element, textElement }.
+ *
+ * `element` (le thread complet) et `textElement` (le texte du commentaire)
+ * sont conservés pour permettre à d'autres modules (ex: bouton de
+ * traduction) d'accrocher de l'UI directement au bon endroit dans la page.
  */
 window.CommentAI.scrapeComments = function scrapeComments() {
   const threads = document.querySelectorAll('ytd-comment-thread-renderer');
@@ -42,6 +46,8 @@ window.CommentAI.scrapeComments = function scrapeComments() {
       author: authorEl ? authorEl.innerText.trim() : 'Inconnu',
       text,
       likes: likesEl ? parseLikeCount(likesEl.innerText) : 0,
+      element: thread,
+      textElement: textEl,
     });
   });
 

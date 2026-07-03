@@ -70,13 +70,29 @@ essaie de cliquer une fois sur la page avant de recharger).
 - [x] Injection automatique du résumé dans le DOM (Shadow DOM, sans action
       utilisateur)
 
-## À faire ensuite (palier 2)
+## Palier 2 — détection de langue + traduction à la demande
 
-- Language Detector API : détecter la langue de chaque commentaire scrapé
-- Comparer à la langue de l'utilisateur (`navigator.language` ou préférence
-  stockée dans `chrome.storage`)
-- Afficher un bouton "Traduire" à côté des commentaires en langue différente
-- Translator API : traduction à la demande au clic
+- [x] `content-scripts/language-detector.js` : détecte la langue de chaque
+      commentaire (`LanguageDetector`) et expose `getUserLanguage()`
+      (basée sur `chrome.i18n.getUILanguage()` / `navigator.language`)
+- [x] `content-scripts/translator.js` : traduit un texte à la demande
+      (`Translator`), avec un cache d'instances par paire de langues pour
+      éviter de recréer un traducteur à chaque clic
+- [x] `ui-injector.js` → `injectTranslateButton()` : ajoute un bouton
+      "Traduire" juste après le texte du commentaire, uniquement si sa
+      langue détectée diffère de la langue utilisateur. Le clic affiche la
+      traduction sous le commentaire d'origine (texte source conservé) ;
+      un second clic la masque.
+- [x] `main.js` → `attachTranslateButtons()` : parcourt tous les
+      commentaires scrapés (pas seulement les 5 résumés), détecte leur
+      langue séquentiellement, et déclenche l'injection du bouton si besoin
+
+**Point d'attention** : la détection de langue est faite commentaire par
+commentaire, de façon séquentielle (`for...of` avec `await`), pour ne pas
+saturer le modèle on-device avec des appels en parallèle. Sur une page
+avec beaucoup de commentaires, ça peut prendre quelques secondes avant que
+tous les boutons apparaissent — regarde les logs `[CommentAI]` dans la
+console pour suivre la progression.
 
 ## Icônes
 

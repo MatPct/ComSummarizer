@@ -40,7 +40,6 @@ window.CommentAI.summarizeComments = async function summarizeComments(comments) 
     type: 'key-points',
     format: 'markdown',
     length: 'short',
-    outputLanguage: 'fr',
     sharedContext:
       `Ce sont des commentaires d'utilisateurs sur ${window.CommentAI.platform === 'youtube' ? 'une vidéo YouTube' : 'un post Reddit'}.`,
     monitor(m) {

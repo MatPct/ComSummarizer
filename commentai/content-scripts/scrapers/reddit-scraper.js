@@ -50,6 +50,8 @@ function scrapeOldReddit() {
       author: authorEl ? authorEl.innerText.trim() : '[supprimé]',
       text,
       likes: scoreEl ? parseInt(scoreEl.innerText, 10) || 0 : 0,
+      element: node,
+      textElement: textEl,
     });
   });
 
@@ -71,7 +73,13 @@ function scrapeNewReddit() {
     const text = textEl.innerText.trim();
     if (!text) return;
 
-    comments.push({ author, text, likes: score });
+    comments.push({
+      author,
+      text,
+      likes: score,
+      element: node,
+      textElement: textEl,
+    });
   });
 
   return comments;
